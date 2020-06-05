@@ -69,8 +69,8 @@ with open('/trainHistoryDictMobileNetpt1', 'wb') as file_pi:
 
 train_loss = hist.history['loss']
 val_loss = hist.history['val_loss']
-train_acc = hist.history['acc']
-val_acc = hist.history['val_acc']
+train_acc = hist.history['categorical_accuracy']
+val_acc = hist.history['val_categorical_accuracy']
 epochs = range(35)
 
 plt.figure(1, figsize=(7,5))
