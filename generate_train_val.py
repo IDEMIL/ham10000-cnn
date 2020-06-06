@@ -66,8 +66,8 @@ for img in test:
 	lesionType = metadata.loc[metadata['image_id'] == img, 'dx'].iloc[0]
 	
 	if imgFileName in images_part1:
-		shutil.copyfile('data/raw/ham10000_images_part_1/' + imgFileName, 'data/test/' + imgFileName)
+		shutil.copyfile('data/raw/ham10000_images_part_1/' + imgFileName, 'data/test/' + lesionType + '/' + imgFileName)
 
 	if imgFileName in images_part2:
-		shutil.copyfile('data/raw/ham10000_images_part_2/' + imgFileName, 'data/test/' + imgFileName)
+		shutil.copyfile('data/raw/ham10000_images_part_2/' + imgFileName, 'data/test/' + lesionType + '/' + imgFileName)
 		

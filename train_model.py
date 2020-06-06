@@ -59,11 +59,10 @@ model.summary()
 model.compile(Adam(lr=0.003), loss='categorical_crossentropy', metrics=['accuracy'])
 epoch_steps = np.floor(6000 / batch_size_train)
 valid_steps = np.floor(2000/ batch_size_valid)
+# Save the model on the epoch where it produces the minimum loss on the validation set
+checkpoint = ModelCheckpoint(trained_model_dir, monitor='val_accuracy', mode='max', verbose=1)
 
 hist = model.fit(train_data, steps_per_epoch=epoch_steps, validation_data=valid_data, validation_steps=valid_steps, callbacks=[ReduceLROnPlateau()], epochs=50, verbose=1)
-
-# Save trained model
-model.save(trained_model_dir)
 
 # Save history for later use
 with open('/trainHistoryDictMobileNetpt1', 'wb') as file_pi:
