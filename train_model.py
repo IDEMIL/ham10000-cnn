@@ -6,15 +6,15 @@ from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import categorical_crossentropy
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.models import Model, Sequential, load_model
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+from tensorflow.keras.models import Model, load_model
+from tensorflow.keras.callbacks import ReduceLROnPlateau
 
 from tensorflow.keras.applications.mobilenet import MobileNet, preprocess_input
 
 import matplotlib.pyplot as plt
 
 # This is the directory where the trained model will be saved
-trained_model_dir = 'models/trained/mobilenet_retrained.h5'
+trained_model_dir = 'models/trained/mobilenet_retrainedpt2.h5'
 
 train_dir = 'data/train'
 valid_dir = 'data/valid'
@@ -22,8 +22,8 @@ valid_dir = 'data/valid'
 #Default model is MobileNet
 model_path = 'models\mobilenet0.25_no_top.h5' 
 
-batch_size_train = 10
-batch_size_valid = 10
+batch_size_train = 32
+batch_size_valid = 32
 
 # Load the training and validation sets into Dataset objects
 imageDataGenerator = ImageDataGenerator(preprocessing_function=preprocess_input)
@@ -44,21 +44,23 @@ print(len(mobileNet.layers))
 
 # Here we configure and create a new model from the existing one
 x = mobileNet.layers[-6].output
-x = Dropout(0.25)(x)
+x = Dropout(0.20)(x)
 predictions = Dense(7, activation='softmax')(x)
 model = Model(inputs=mobileNet.input, outputs=predictions)
 
 
-# Set all the layers except the last as trainable: This can be changed in the future
+# Set all the layers except the last 6 as trainable: This can be changed in the future
 for layer in model.layers[:-6]:
 	layer.trainable = False
 	
 model.summary()
 
 # Compile the model
-model.compile(Adam(lr=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(Adam(lr=0.003), loss='categorical_crossentropy', metrics=['accuracy'])
+epoch_steps = np.floor(6000 / batch_size_train)
+valid_steps = np.floor(2000/ batch_size_valid)
 
-hist = model.fit(train_data, steps_per_epoch=np.ceil(6000/8), validation_data=valid_data, validation_steps=np.ceil(2000/8), epochs=35, verbose=1)
+hist = model.fit(train_data, steps_per_epoch=epoch_steps, validation_data=valid_data, validation_steps=valid_steps, callbacks=[ReduceLROnPlateau()], epochs=50, verbose=1)
 
 # Save trained model
 model.save(trained_model_dir)
@@ -69,9 +71,9 @@ with open('/trainHistoryDictMobileNetpt1', 'wb') as file_pi:
 
 train_loss = hist.history['loss']
 val_loss = hist.history['val_loss']
-train_acc = hist.history['categorical_accuracy']
-val_acc = hist.history['val_categorical_accuracy']
-epochs = range(35)
+train_acc = hist.history['accuracy']
+val_acc = hist.history['val_accuracy']
+epochs = range(1, len(train_acc) + 1)
 
 plt.figure(1, figsize=(7,5))
 plt.plot(epochs, train_loss, 'go')
@@ -90,7 +92,7 @@ plt.xlabel('No. of epochs')
 plt.ylabel('Accuracy')
 plt.title('validation and training accuracy')
 plt.grid(True)
-plt.legend(['Training accuracy', 'Validation accuracy'])
+plt.legend(['Training accuracy', 'Validation accuracy'], loc='lower right')
 plt.style.use(['classic'])
 
 plt.show()
