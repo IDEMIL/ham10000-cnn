@@ -7,7 +7,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import categorical_crossentropy
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Model, load_model
-from tensorflow.keras.callbacks import ReduceLROnPlateau
+from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint
 
 from tensorflow.keras.applications.mobilenet import MobileNet, preprocess_input
 
@@ -56,13 +56,14 @@ for layer in model.layers[:-6]:
 model.summary()
 
 # Compile the model
-model.compile(Adam(lr=0.003), loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(Adam(lr=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
 epoch_steps = np.floor(6000 / batch_size_train)
 valid_steps = np.floor(2000/ batch_size_valid)
 # Save the model on the epoch where it produces the minimum loss on the validation set
-checkpoint = ModelCheckpoint(trained_model_dir, monitor='val_accuracy', mode='max', verbose=1)
+checkpoint = ModelCheckpoint(trained_model_dir, monitor='val_accuracy', mode='max', save_best_only=True, verbose=1)
+lrReducer = ReduceLROnPlateau(verbose=1)
 
-hist = model.fit(train_data, steps_per_epoch=epoch_steps, validation_data=valid_data, validation_steps=valid_steps, callbacks=[ReduceLROnPlateau()], epochs=50, verbose=1)
+hist = model.fit(train_data, steps_per_epoch=epoch_steps, validation_data=valid_data, validation_steps=valid_steps, callbacks=[lrReducer, checkpoint], epochs=50, verbose=1)
 
 # Save history for later use
 with open('/trainHistoryDictMobileNetpt1', 'wb') as file_pi:
@@ -75,8 +76,8 @@ val_acc = hist.history['val_accuracy']
 epochs = range(1, len(train_acc) + 1)
 
 plt.figure(1, figsize=(7,5))
-plt.plot(epochs, train_loss, 'go')
-plt.plot(epochs, val_loss)
+plt.plot(epochs, train_loss, color='yellowgreen', linewidth=3)
+plt.plot(epochs, val_loss, color='rebeccapurple', linewidth=3)
 plt.xlabel('No. of epochs')
 plt.ylabel('Loss')
 plt.title('validation and training loss')
@@ -85,8 +86,8 @@ plt.legend(['Training loss', 'Validation loss'])
 plt.style.use(['classic'])
 
 plt.figure(2, figsize=(7,5))
-plt.plot(epochs, train_acc, 'go')
-plt.plot(epochs, val_acc)
+plt.plot(epochs, train_acc, color='yellowgreen', linewidth=3)
+plt.plot(epochs, val_acc, color='rebeccapurple', linewidth=3)
 plt.xlabel('No. of epochs')
 plt.ylabel('Accuracy')
 plt.title('validation and training accuracy')
