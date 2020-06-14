@@ -9,12 +9,12 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint
 
-from tensorflow.keras.applications.mobilenet import MobileNet, preprocess_input
+from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
 
 import matplotlib.pyplot as plt
 
 # This is the directory where the trained model will be saved
-trained_model_dir = 'models/trained/mobilenet_retrainedpt2.h5'
+trained_model_dir = 'models/trained/mobilenetv2_retrainedpt3.h5'
 
 train_dir = 'data/train'
 valid_dir = 'data/valid'
@@ -31,7 +31,7 @@ train_data = imageDataGenerator.flow_from_directory(train_dir, target_size=(224,
 valid_data = imageDataGenerator.flow_from_directory(valid_dir, target_size=(224, 224), classes=['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc'], batch_size=batch_size_valid)
 
 # Load model - Initial Download
-mobileNet = MobileNet()
+mobileNet = MobileNetV2(alpha=1.4)
 
 # Load model - Local Directory
 #mobileNet = load_model(model_path)
@@ -43,7 +43,7 @@ print(len(mobileNet.layers))
 #mobileNet.save(model_path)
 
 # Here we configure and create a new model from the existing one
-x = mobileNet.layers[-6].output
+x = mobileNet.layers[-2].output
 x = Dropout(0.20)(x)
 predictions = Dense(7, activation='softmax')(x)
 model = Model(inputs=mobileNet.input, outputs=predictions)
