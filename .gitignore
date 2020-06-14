@@ -1,5 +1,6 @@
 *.jpg
 *.h5
+*.zip
 /data/raw
 /models/*
 /screenshots
