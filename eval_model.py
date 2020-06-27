@@ -8,7 +8,7 @@ import itertools
 import numpy as np
 
 # This is the path from where the trained model will be loaded from
-trained_model_dir = 'models/trained/mobilenetv2_retrainedpt3.h5'
+trained_model_dir = 'models/trained/mobilenet_retrainedpt2.h5'
 
 # This is the directory containing the test data
 test_dir = 'data/test'
@@ -23,9 +23,7 @@ test_data = imageDataGenerator.flow_from_directory(test_dir, target_size=(224, 2
 results = model.evaluate(test_data, batch_size=10)
 print('test loss, test acc:', results)
 
-
 test_labels = test_data.labels
-#test_labels = test_labels[:,0]
 
 print(test_labels)
 

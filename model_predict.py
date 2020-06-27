@@ -6,7 +6,7 @@ from keras.preprocessing import image
 import numpy as np
 
 # This is the path from where the trained model will be loaded from
-trained_model_dir = 'models/trained/mobilenetv2_retrainedpt3.h5'
+trained_model_dir = 'models/trained/mobilenet_retrainedpt2.h5'
 
 # This is the directory containing the test data
 test_dir = 'data/test'
@@ -14,7 +14,7 @@ test_dir = 'data/test'
 # Load model
 model = load_model(trained_model_dir)
 
-img = image.load_img('data/test/nv/ISIC_0024350.jpg', target_size = (224, 224))
+img = image.load_img('data/test/nv/ISIC_0024335.jpg', target_size = (224, 224))
 img = image.img_to_array(img)
 img = np.expand_dims(img, axis = 0)
 
