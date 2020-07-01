@@ -3,6 +3,8 @@ import numpy as np
 import os
 import shutil
 
+from efficientnet.tfkeras import preprocess_input
+
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 
