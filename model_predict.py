@@ -1,7 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.applications.mobilenet import preprocess_input
 from keras.preprocessing import image
 import numpy as np
 

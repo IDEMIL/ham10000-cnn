@@ -9,14 +9,15 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint
 
-from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
+from efficientnet.tfkeras import EfficientNetB4
+from efficientnet.tfkeras import preprocess_input
 
 import matplotlib.pyplot as plt
 
 import os.path
 
 # This is the directory where the trained model will be saved
-trained_model_dir = 'models/trained/mobilenetv2_retrainedpt6.h5'
+trained_model_dir = 'models/trained/effnetb4_retrainedpt12.h5'
 
 if os.path.exists(trained_model_dir):
 	print('Error: Please specify a new path for the newly trained model in the source code.')
@@ -26,34 +27,32 @@ if os.path.exists(trained_model_dir):
 train_dir = 'data/train'
 valid_dir = 'data/valid'
 
-#Default model is MobileNet
-model_path = 'models\mobilenet0.25_no_top.h5' 
-
 # Batch size was chosen with help from https://stackoverflow.com/questions/49922252/choosing-number-of-steps-per-epoch
-batch_size_train = 32
-batch_size_valid = 32
+batch_size_train = 12
+batch_size_valid = 12
 
 # Load the training and validation sets into Dataset objects
-train_imageDataGenerator = ImageDataGenerator(preprocessing_function=preprocess_input, rotation_range=20, shear_range=0.15, zoom_range=0.2, horizontal_flip=True)
+train_imageDataGenerator = ImageDataGenerator(preprocessing_function=preprocess_input, rotation_range=20, zoom_range=0.2, horizontal_flip=True)
 test_imageDataGenerator = ImageDataGenerator(preprocessing_function=preprocess_input)
-train_data = train_imageDataGenerator.flow_from_directory(train_dir, target_size=(224, 224), classes=['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc'], batch_size=batch_size_train)
-valid_data = test_imageDataGenerator.flow_from_directory(valid_dir, target_size=(224, 224), classes=['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc'], batch_size=batch_size_valid)
+train_data = train_imageDataGenerator.flow_from_directory(train_dir, target_size=(380, 380), classes=['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc'], batch_size=batch_size_train)
+valid_data = test_imageDataGenerator.flow_from_directory(valid_dir, target_size=(380, 380), classes=['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc'], batch_size=batch_size_valid)
+
 
 # Load model - Initial Download
-mobileNet = MobileNetV2(alpha=1.4)
+effnet = EfficientNetB4(weights='imagenet')
 
-mobileNet.summary()
+effnet.summary()
 
-print(len(mobileNet.layers))
+print(len(effnet.layers))
 
 # Here we configure and create a new model from the existing one
-x = mobileNet.layers[-2].output
-x = Dropout(0.35)(x)
+x = effnet.layers[-3].output
+x = Dropout(0.30)(x)
 predictions = Dense(7, activation='softmax')(x)
-model = Model(inputs=mobileNet.input, outputs=predictions)
+model = Model(inputs=effnet.input, outputs=predictions)
 
-# Set all the layers except the last 6 as trainable: This can be changed in the future
-for layer in model.layers[:-6]:
+# Set all the layers except the last 141 as trainable: This can be changed in the future
+for layer in model.layers[:-141]:
 	layer.trainable = False
 	
 model.summary()
@@ -66,7 +65,7 @@ valid_steps = np.floor(2000/ batch_size_valid)
 checkpoint = ModelCheckpoint(trained_model_dir, monitor='val_accuracy', mode='max', save_best_only=True, verbose=1)
 lrReducer = ReduceLROnPlateau(verbose=1)
 
-hist = model.fit(train_data, steps_per_epoch=epoch_steps, validation_data=valid_data, validation_steps=valid_steps, callbacks=[lrReducer, checkpoint], epochs=100, verbose=1)
+hist = model.fit(train_data, steps_per_epoch=epoch_steps, validation_data=valid_data, validation_steps=valid_steps, callbacks=[lrReducer, checkpoint], epochs=40, verbose=1)
 
 # The following code plots validation and loss, code adapted from Anuj Shah at https://www.youtube.com/watch?v=9pDlJ5aAFN4
 

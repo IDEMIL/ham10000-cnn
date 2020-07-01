@@ -25,8 +25,6 @@ plt.xticks(y_pos, classes)
 plt.ylabel('Images')
 plt.title('Number of images per class')
 
-plt.show()
-
 # Shuffle the metadata
 metadata = metadata.sample(frac=1).reset_index(drop=True)
 
@@ -85,3 +83,5 @@ for img in test:
 	if imgFileName in images_part2:
 		shutil.copyfile('data/raw/ham10000_images_part_2/' + imgFileName, 'data/test/' + lesionType + '/' + imgFileName)
 		
+		
+plt.show()
