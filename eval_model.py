@@ -71,7 +71,7 @@ def plot_confusion_matrix(cm, classes,
 
 plot_confusion_matrix(matrix, matrix_labels)
 plt.show()
-f
+
 evaluation = classification_report(rounded_preds, test_data.classes, target_names=matrix_labels)
 
 print(evaluation)

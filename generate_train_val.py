@@ -18,15 +18,6 @@ metadata = pandas.read_csv(metadata_path)
 # Display the number of images for each class. Important to show the class imbalance. Adapted from https://pythonspot.com/matplotlib-bar-chart/
 print(metadata['dx'].value_counts())
 
-classes = ('nv', 'mel', 'bkl', 'bcc', 'akiec', 'vasc', 'df')
-y_pos = np.arange(len(classes))
-performance = metadata['dx'].value_counts()
-
-plt.bar(y_pos, performance, align='center', alpha=0.5)
-plt.xticks(y_pos, classes)
-plt.ylabel('Images')
-plt.title('Number of images per class')
-
 # Shuffle the metadata
 metadata = metadata.sample(frac=1).reset_index(drop=True)
 
@@ -86,4 +77,3 @@ for img in test:
 		shutil.copyfile('data/raw/ham10000_images_part_2/' + imgFileName, 'data/test/' + lesionType + '/' + imgFileName)
 		
 		
-plt.show()
