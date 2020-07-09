@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Prediction App</title>
+		<link rel="stylesheet" type="text/css" href="predictions.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Baloo+Da+2">
+	</head>
+	
+	<body>
+		
+		<img id="selected-image" src="placeholder.jpg"/>
+		<div id="preds">
+			<p style="font-weight:bold">Predictions</p>    
+			Actinic Keratoses/Intraepithelial Carcinoma: <span id="akiec-pred"></span><br>
+			Basal Cell Carcinoma: <span id="bcc-pred"></span><br>
+			Benign Keratoses: <span id="bkl-pred"></span><br>
+			Dermatofibra: <span id="df-pred"></span><br>
+			Melanoma: <span id="mel-pred"></span><br>
+			Melanocytic Nevi: <span id="nv-pred"></span><br>
+			Vascular: <span id="vasc-pred"></span>	<br>
+		</div>
+		
+		<div id="buttons">
+			<input id="image-select" type="file">    
+			<button id="predict-button">Classify</button>
+		</div>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+		<script>
+			let base64Image;
+			$("#image-select").change(function() {
+				let reader = new FileReader();
+				reader.onload = function(e) {
+					let dataURL = reader.result;
+					$('#selected-image').attr("src", dataURL);
+					base64Image = dataURL.replace("data:image/jpeg;base64,","");
+					console.log(base64Image);
+				}
+				reader.readAsDataURL($("#image-select")[0].files[0]);
+				$("#akiec-pred").text("");
+				$("#bcc-pred").text("");
+				$("#bkl-pred").text("");
+				$("#df-pred").text("");
+				$("#mel-pred").text("");
+				$("#nv-pred").text("");
+				$("#vasc-pred").text("");
+			});
+
+			$("#predict-button").click(function(){
+				let message = {
+					image: base64Image
+				}
+				console.log(message);
+				$.post("http://127.0.0.1:5000/predictions", JSON.stringify(message), function(response){
+					console.log(response);
+					$("#akiec-pred").text((Math.round(response.prediction.akiec * 10000) / 100) + '%');
+					$("#bcc-pred").text((Math.round(response.prediction.bcc * 10000) / 100) + '%');
+					$("#bkl-pred").text((Math.round(response.prediction.bkl * 10000) / 100) + '%');
+					$("#df-pred").text((Math.round(response.prediction.df * 10000) / 100) + '%');
+					$("#mel-pred").text((Math.round(response.prediction.mel * 10000) / 100) + '%');
+					$("#nv-pred").text((Math.round(response.prediction.nv * 10000) / 100) + '%');
+					$("#vasc-pred").text((Math.round(response.prediction.vasc * 10000) / 100) + '%');
+					console.log(response);
+
+				});
+			});
+		</script>
+	</body>
+
+</html>

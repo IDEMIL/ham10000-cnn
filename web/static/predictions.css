@@ -1,0 +1,31 @@
+body {
+  font-family: 'Baloo Da 2', serif;
+  font-size: 20px;
+  background-color: #EAE7DC;
+  margin: 0;
+  padding-top: 10px;
+}
+
+
+span {
+	font-weight: 900;
+}
+
+#preds {
+	width: 30%;
+	margin: auto;
+	display: block;
+}
+
+#selected-image {
+	border: 1px solid;
+	width: 30%;
+	margin: auto;
+	display: block;
+	height: 360px;
+}
+
+#buttons {
+	width: 30%;
+	margin: auto;
+}
